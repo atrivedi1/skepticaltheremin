@@ -1,45 +1,24 @@
-
+//define requirements
 var express = require('express');
-var mongoose = require('mongoose');
-var bodyParser = require('body-parser');
 var path = require('path');
-
-var router = require('./router/router.js')
-var userController = require('./controllers/userControllers.js');
+var bodyParser = require('body-parser');
 
 var app = express();
-var port = process.env.PORT || 3000;
 
-// var MONGO_DB = "mongodb://mewpeter:Peirce234@ds037415.mongolab.com:37415/breadcrumbs";
-// var MONGO_DB;
-// mongoose.connect(MONGO_DB || 'mongodb://localhost/maps');
-
+//apply middleware
+//NOTE: will need to change this route once we redo the file structure
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
-
 app.use(express.static(path.join(__dirname, "/public")));
     
+//set up routes
+//NOTE: will need to change this route once we redo the file structure
+require('./router/router.js')(app);
 
-//redirect to home at a hash url
-  // need to add middleware for actual loging authentication
-app.get('/signup', function(req, res){
-  console.log('signup');
-  res.redirect('/#map')
-});
-
-app.post('/login', function(req, res){
-  console.log('signup');
-  res.redirect('/#map')
-})
-
-
-//api routing
-
-
-app.use('/api', router);
-
-
-console.log('mapp app on port ' + port);
-app.listen(port);  
+//set up ports
+var port = process.env.PORT || 3000;
+app.listen(port, function(){
+	console.log('Server listening on port ' + port);
+});  
 
 module.exports = app;
