@@ -3,8 +3,11 @@
 //and manipulate the database.
 //****************************************************
 var mongoose = require('mongoose');
-var User = require('../models/user.js');
-var Pin = require('../models/pin.js');
+var User = require('../models/userPG.js');
+var Pin = require('../models/pinPG.js');
+var Story = require('../models/storyPG.js');
+var Friend = require('../models/friendPG.js');
+var Category = require('../models/categoryPG.js');
 
 //////////////////
 //users controllers
