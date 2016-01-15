@@ -1,3 +1,19 @@
 //define requirements
-var Pin = require('../models/pinPG.js');
-var Category = require('../models/categoryPG.js');
+var db = require('../models/config.js');
+
+module.exports = {
+	createPin: function(params, callback){
+	  var queryString = "";
+	  db.query(queryString, params, function(err, results){
+	    callback(err, results);
+	  });
+	},
+
+	removePin: function(params, callback){
+	  var queryString = "";
+	  db.query(queryString, params, function(err, results){
+	    callback(err, results);
+	  });
+	}
+};
+
