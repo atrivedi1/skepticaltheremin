@@ -97,52 +97,53 @@ module.exports = function(app){
   // }); 
 
   //view a story (personal or a friend's)
-  app.get('/api/story/:name', function (req, res) {
+  app.get('/api/story/:storyid', function (req, res) {
     console.log("trying to view ONE story");
-    var storyData = [req.body.username, req.body.category, req.body.storyName];
-    controller.story.viewStory(storyData, function(err, data){
+    var storyID = [Number(req.params.storyid)];
+    controller.pin.viewStory(storyID, function(err, data){
        if (err) {
         return console.error(err);
       }
-      res.end(data);
-      console.log("successfully enabling user to view ONE stories");
+      //turns data into json;
+      res.json(data.rows);
+      console.log("successfully enabling user to view ONE story");
     });
   }); 
 
 
   //view all stories (personal or friend's)
-  app.get('/api/story/', function (req, res) {
+  app.get('/api/story/allstories/:userid', function (req, res) {
     console.log("trying to view ALL stories");
-    var storyData = [req.body.username, req.body.category, req.body.storyName];
-    controller.story.viewStories(storyData, function(err, data){
+    var userID = [Number(req.params.userid)];
+    controller.pin.viewStories(userID, function(err, data){
        if (err) {
         return console.error(err);
       }
-      res.end();
+      res.json(data);
       console.log("successfully enabling user to view ALL stories");
     });
   });
 
-  //remove story
 
-  app.delete('/api/story', function (req, res) {
-    console.log("trying to delete an existing story");
-    var storyData = [req.body.username, req.body.category, req.body.storyName];
-    controller.user.removeStory(username, function(err, data){
-       if (err) {
-        return console.error(err);
-      }
-      res.end();
-      console.log("successfully deleted story from db");
-    });
-  });
+  //remove story
+  // app.delete('/api/story/:storyid', function (req, res) {
+  //   console.log("trying to delete an existing story");
+  //   var storyID = [Number(req.params.storyid)];
+  //   controller.user.removeStory(username, function(err, data){
+  //      if (err) {
+  //       return console.error(err);
+  //     }
+  //     res.end();
+  //     console.log("successfully deleted story from db");
+  //   });
+  // });
 
 ///////////////////////////////////////////////////PIN-RELATED REQUEST HANDLERS////////////////////////////////////////////////
 
-  //drop pin
+  //add pin
   app.post('/api/pin/:storyid', function (req, res) {
     console.log("adding a pin");
-    var pinData = [req.body.userid, Number(req.params.storyid), req.body.categoryid, req.body.location, req.body.latitude, req.body.longitude, req.body.comment, req.body.time];
+    var pinData = [req.body.userid, Number(req.params.storyid), req.body.location, req.body.latitude, req.body.longitude, req.body.comment, req.body.time];
     controller.pin.createPin(pinData, function(err, data){
        if (err) {
         return console.error(err);
@@ -151,6 +152,20 @@ module.exports = function(app){
       console.log("successfully added a pin");
     });
   });
+
+  //edit pin
+  // app.put('/api/pin/:storyid', function (req, res) {
+  //   console.log("adding a pin");
+  //   var pinData = [req.body.userid, Number(req.params.storyid), req.body.location, req.body.latitude, req.body.longitude, req.body.comment, req.body.time];
+  //   controller.pin.createPin(pinData, function(err, data){
+  //      if (err) {
+  //       return console.error(err);
+  //     }
+  //     res.sendStatus(201);
+  //     console.log("successfully added a pin");
+  //   });
+  // });
+
 
   //remove pin
   app.delete('/api/pin/:id', function (req, res) {

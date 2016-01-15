@@ -41,7 +41,7 @@ CREATE TABLE pins(
 	categoryid integer REFERENCES categories(id), 
 	location varchar(200),
 	latitude real, 
-	longitutde real, 
+	longitude real, 
 	comment varchar(200),
 	time integer
 );
