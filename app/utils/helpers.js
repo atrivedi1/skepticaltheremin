@@ -107,7 +107,19 @@ var addPin = function(username, pin, cb){
 
 };
 
-
+var deletePinRequest = function(id){
+  console.log('HELPER delete Pin', id);
+  // $.ajax({
+  //   url:`/api/pin/${id}`,
+  //   type:'DELETE',
+  //   success:function(response){
+  //     console.log(response);
+  //   },
+  //   error: function(xhr, status, err) {
+  //     console.log(status, err.toString());
+  //   }
+  // })
+};
 
 var addBreadCrumb = function(username, breadcrumb, cb) {
   console.log(username);
@@ -190,6 +202,7 @@ var helpers = {
   getSingleStory: getSingleStory,
   createNewStory: createNewStory,
   getUserID: getUserID
+
 }
 
 module.exports = helpers;
