@@ -7,7 +7,8 @@ var Search = React.createClass({
   },
 
   handleChange(event) {
-    this.setState({value: event.target.value});
+    var location = $('#autocomplete').val();
+    this.setState({value: location});
   },
 
   handleSubmit(event){
@@ -29,8 +30,10 @@ var Search = React.createClass({
         <div className="form-group">
           <div className="col-xs-12 col-md-6 col-md-offset-3">
             <div className="input-group">
-              <input type="text" className="form-control" id="address" placeholder="Find a location..." 
-              value={this.state.value} onChange={this.handleChange} />
+              <div id="locationField">
+                <input id="autocomplete" type="text" className="form-control" placeholder="Place a pin..." 
+                value={this.state.value} onChange={this.handleChange} />
+              </div>
               <span className="input-group-btn">
                 <span data-toggle="modal" data-target="#myModal" className="glyphicon glyphicon-search" aria-hidden="true"></span>
               </span>
