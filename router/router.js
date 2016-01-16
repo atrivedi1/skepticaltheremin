@@ -2,7 +2,7 @@
 var controller = require('../controllers');
 if (!process.env.APP_ID) {
   var config = require('../config.js');
-};
+}
 var request = require('request');
 var session = require('express-session');
 
