@@ -214,7 +214,7 @@ var MapApp = React.createClass({
       return (
         <div>
 
-          <h1 className="col-xs-12 col-md-6 col-md-offset-3">My Breadcrumbs</h1>
+          <h1 className="col-xs-12 col-md-6 col-md-offset-3">MyPaths</h1>
 
           {/*The search results are extracted from this component and passed to the searchForAddress.*/}
           {/*The search Address only updates the current Coordinates.*/}

@@ -65,7 +65,6 @@ var Map = React.createClass({
     this.setState({currentComment: e.target.value})
   },
   updateComment(){
-    alert("sumbitting new comment");
     var pinID = this.state.commentID;
     var newComment = this.state.currentComment;
     $("#commentModal").modal('hide');
@@ -82,7 +81,6 @@ var Map = React.createClass({
 
   // Loading all the old Pins from the database
   loadOldPins(){
-    debugger;
     var cachedStories = {
     };
 
@@ -99,6 +97,7 @@ var Map = React.createClass({
       cachedStories[pin.storyID] = cachedStories[pin.storyID] || {color: this.getRandomColor(), list:[]};
       cachedStories[pin.storyID]['list'].push(pin);
       
+
 
       map.addMarker({
         lat: pin.latitude,
@@ -135,48 +134,30 @@ var Map = React.createClass({
         
       }
 
+      // Since infoWindow is taken cared of by google
+      // I have to use jquery here
+      var self = this;
+
+      $(document).on('click', '.delete', function(e){
+
+        var id= $(this).data('pinid');
+
+        // GOING TO SEND THE DELETED PIN TO THE DATABASE
+        self.deletePin(id);
+
+      })
+
+      $(document).on('click', '.viewComment', function(){
+        var comment = $(this).data('comment');
+        var commentID =  $(this).parent().find('.delete').data('pinid');
+        self.setState({commentID: commentID});
+        self.setState({currentComment: comment  });
+        $("#commentModal").modal()
+      });
+
     }.bind(this));
 
 
-    // Since infoWindow is taken cared of by google
-    // I have to use jquery here
-    var self = this;
-
-    $(document).on('click', '.delete', function(e){
-
-      var id= $(this).data('pinid');
-
-      // GOING TO SEND THE DELETED PIN TO THE DATABASE
-      alert('delete');
-      self.deletePin(id);
-      
-      // var pinList = self.state.oldPins
-
-      // var array = [];
-      // for(var i = 0; i < pinList.length; i++){ 
-      //   var pin = pinList[i];
-      //   if(pin.pinID !== id){
-      //     array.push(pinList[i]);  
-      //   } else {
-      //     console.log('Deleting', pin.pinID);
-      //   }
-      // }
-
-      // console.log(array);
-
-      // self.setState({'oldPins': array, 'delete':true}, function(){
-      //   self.loadOldPins();
-      // });
-
-    })
-
-    $(document).on('click', '.viewComment', function(){
-      var comment = $(this).data('comment');
-      var commentID =  $(this).parent().find('.delete').data('pinid');
-      self.setState({commentID: commentID});
-      self.setState({currentComment: comment });
-      $("#commentModal").modal()
-    })
 
   },
 
@@ -204,7 +185,6 @@ var Map = React.createClass({
   },
 
   componentDidMount(){
-    // alert('Did');
     // Only componentDidMount is called when the component is first added to
     // the page. This is why we are calling the following method manually. 
     // This makes sure that our map initialization code is run the first time.
@@ -308,8 +288,6 @@ var Map = React.createClass({
     this.loadOldPins();
 
     if( this.props.oldPins.length !== this.state.oldPins.length ){
-      alert("PINS have updated");
-
       console.log("NEW PINS", this.props.oldPins);
       console.log('jjjj', this.state.oldPins);
       debugger;
