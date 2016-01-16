@@ -26,21 +26,24 @@ var getUserID = function(callback) {
       console.log(status,err.toString());
     }
   });
-  // callback(); for testing purposes
+  // callback(); //for testing purposes
 };
 
-var createNewStory = function(storyName, callback) {
-  // $.ajax({
-  //   url: '/api/story',
-  //   type: 'POST',
-  //   success: function(data) {
-  //     callback(data);
-  //   },
-  //   error: function(xhr, status, err) {
-  //     console.log(status,err.toString());
-  //   }
-  // });
-  callback({id: 2, name:'Hi'});
+var createNewStory = function(storyName, userID, callback) {
+  console.log(storyName);
+  var storyData = {userid: userID, storyName: storyName};
+  $.ajax({
+    url: '/api/story',
+    type: 'POST',
+    data: storyData,
+    success: function(data) {
+      callback(data);
+    },
+    error: function(xhr, status, err) {
+      console.log('error creating story');
+    }
+  });
+  // callback({id: 2, name:'Hi'});
 };
 
 var getSingleStory = function(storyID, callback) {
@@ -89,18 +92,18 @@ var sendStory = function(username, storyList, cb){
   // })
 };
 
-var addPin = function(username, pin, cb){
-  
+var addPin = function(pindata, storyID, callback){
+  console.log('about to ajax', storyID);
   $.ajax({
-    url: `/api/pins/${storyID}`,
+    url: '/api/pin/' + storyID,
     type: "POST",
-    data: pin,
+    data: pindata,
     success: function(response){
-      console.log(response);
-      
+      callback(response);
+      console.log('added pin to db');
     },
     error: function(xhr, status, err) {
-      console.log(status, err.toString());
+      console.log('failed adding pin');
     }
   });
 

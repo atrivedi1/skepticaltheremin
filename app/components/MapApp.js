@@ -20,8 +20,13 @@ var MapApp = React.createClass({
 
 
     var storyPins = this.props.storyPins;
-    var lng = storyPins[ storyPins.length-1 ].longitude;
-    var lat = storyPins[ storyPins.length-1 ].latitude;
+    if(storyPins.length !== 0) {
+      var lng = storyPins[ storyPins.length-1 ].longitude;
+      var lat = storyPins[ storyPins.length-1 ].latitude;    
+    } else {
+      var lng = -122.431297;
+      var lat = 37.773972;
+    }
 
 
     return {
@@ -49,6 +54,23 @@ var MapApp = React.createClass({
   },
 
 
+  componentDidUpdate() {
+    // var storyPins = this.props.storyPins;
+    // if(storyPins.length !== 0) {
+    //   var lng = storyPins[ storyPins.length-1 ].longitude;
+    //   var lat = storyPins[ storyPins.length-1 ].latitude;    
+    // } else {
+    //   var lng = -122.431297;
+    //   var lat = 37.773972;
+    // }
+
+    // this.setState({
+    //    center: {
+    //     lat: lat,
+    //     lng: lng,
+    //   }
+    // });
+  },
 
   componentDidMount(){
 

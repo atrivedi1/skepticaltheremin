@@ -82,7 +82,7 @@ var Map = React.createClass({
 
   // Loading all the old Pins from the database
   loadOldPins(){
-
+    debugger;
     var cachedStories = {
     };
 
@@ -106,7 +106,7 @@ var Map = React.createClass({
         infoWindow:{
           content: `<div>
           <a class='viewComment' data-comment=${pin.comment}>View Comment</a> <br><br>
-          <a data-pinid=${pin.pinID} class='delete'>Delete</a>
+          <a data-pinid=${pin.id} class='delete'>Delete</a>
         </div>`
         },
         title: pin.location,
@@ -147,6 +147,7 @@ var Map = React.createClass({
       var id= $(this).data('pinid');
 
       // GOING TO SEND THE DELETED PIN TO THE DATABASE
+      alert('delete');
       self.deletePin(id);
       
       // var pinList = self.state.oldPins
@@ -214,7 +215,7 @@ var Map = React.createClass({
     // This is creating the map and centering our code
     var map = new GMaps({
       el: '#map',
-      zoom:2,
+      zoom: 2,
       lat: this.props.lat,
       lng: this.props.lng,
       styles: [{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"color":"#444444"}]},{"featureType":"landscape","elementType":"all","stylers":[{"color":"#f2f2f2"}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road","elementType":"all","stylers":[{"saturation":-100},{"lightness":45}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.arterial","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"transit","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#46bcec"},{"visibility":"on"}]}]
@@ -246,50 +247,51 @@ var Map = React.createClass({
 
         // THIS FUNCTION IS CALLED ON A RIGHT CLICK
         action: function(e) {
-          $("#myModal").modal();
-          var addressString = e.latLng.lat().toString() + " " +  e.latLng.lng().toString();
           
+          var addressString = e.latLng.lat().toString() + " " +  e.latLng.lng().toString();
+          console.log(addressString);
           // UPDATE TO NEW LOCATION. RERENDERS THE PARENT COMPONENT WHICH THEN RERENDERS THIS COMPONENT UPDATING THE PROPS TO THE NEW RIGHT CLICKED LOCATION
           // PASSES THE LG AND LT TO SEARCHADDRESS IN MAPAPP
           // MAPAPP PASSES IT TO THIS FILE HERE AND PASSES IT TO THE LOCATION INPUT
           self.props.searchAddress(addressString, function(newLocation){
-            
+            var time = Date.now();
             // Were setting state inside here manually causing a re-render
-            self.setState({location: newLocation, comment: "Add comments here!"});         
+            self.setState({
+              location: newLocation,
+              comment: "Add comments here!",
+              lastMarkerTimeStamp: time,
+              lat: e.latLng.lat(),
+              lng: e.latLng.lng()
+            },function(){
+              $("#myModal").modal();
+            });
           });
-
-
-
-          // Time on when the map was clicked
-          var time = Date.now();
-          self.setState({lastMarkerTimeStamp: time});
           
-          // When clicked it will always add a marker at this location
-          var marker = this.addMarker({
-            lat: e.latLng.lat(),
-            lng: e.latLng.lng(),
-            title: 'New marker',
-            timestamp: time,
-            // icon: {
-            //   path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-            //   strokeColor: "green",
-            //   scale: 5
-            // },
-            click: function(e) {
-              self.setState({currentMarker: this});
-              self.updateCurrentLocation();
-            }
-          });
+          
+          // //When clicked it will always add a marker at this location
+          // var marker = this.addMarker({
+          //   lat: e.latLng.lat(),
+          //   lng: e.latLng.lng(),
+          //   title: 'New marker',
+          //   timestamp: time,
+          //   // icon: {
+          //   //   path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+          //   //   strokeColor: "green",
+          //   //   scale: 5
+          //   // },
+          //   click: function(e) {
+          //     self.setState({currentMarker: this});
+          //     self.updateCurrentLocation();
+          //   }
+          // });
 
-
-          self.setState({currentMarker: marker});
-          self.updateCurrentLocation();
+        //   self.setState({currentMarker: marker});
+        //   self.updateCurrentLocation();
         }
       }, {
         title: 'Center here',
         name: 'center_here',
         action: function(e) {
-          console.log("fuck");
           this.setCenter(e.latLng.lat(), e.latLng.lng());
         }
       }]
@@ -303,12 +305,14 @@ var Map = React.createClass({
     //Then update the states oldPin to refer to the actual pinList
     // console.log('DELETED PIN',this.state.oldPins);
 
-    // this.loadOldPins();
+    this.loadOldPins();
 
     if( this.props.oldPins.length !== this.state.oldPins.length ){
-
       alert("PINS have updated");
-      //debugger;  
+
+      console.log("NEW PINS", this.props.oldPins);
+      console.log('jjjj', this.state.oldPins);
+      debugger;
       this.setState({oldPins:this.props.oldPins}, function(){
         this.loadOldPins();
       })
@@ -340,6 +344,7 @@ var Map = React.createClass({
 
   persistPin(){
 
+
     // Get the lat and lng from MAP Apps SEARCH COMPONENT
     var lat = this.props.lat;
     var lng = this.props.lng;
@@ -353,56 +358,22 @@ var Map = React.createClass({
     // LAT AND LNG CAN BE EITHER FROM THE SEARCH COMPONENET OR FROM THE RIGHT CLICK FEATRUE FROM GMAPS. THIS IS BECAUSE SEARCHADRESS IS INVOKED
     var pinObject = {
       latitude: lat,
-      longitutde: lng,
-      time: timestamp,
+      longitude: lng,
+      // time: timestamp,
       // The address for the pin
       location: location,
       // Comment relating to that pin
       comment: comment,
       // The stories name
-      name: storyName
+      name: storyName,
+      userid: this.props.userID
     };
 
     // Adding a story to our database
     this.props.addStoryPin(pinObject, function(){
+      console.log();
       $("#myModal").modal('hide')
     }.bind(this));
-
-
-    // if(this.state.storyList.length > 1){
-    //   var storyList = this.state.storyList;
-
-    //   var prevPin = storyList[storyList.length-2];
-
-    //   this.state.map.drawRoute({
-    //     origin: [prevPin.latitude, prevPin.longitutde ],
-    //     destination: [lat, lng],
-    //     travelMode: 'driving',
-    //     strokeColor: '#131540',
-    //     strokeOpacity: 1,
-    //     strokeWeight: 6
-    //   }); 
-    // }
-
-    // Updating the state with the the pins that are making up a story
-    // this.setState({"storyList": this.state.storyList.push(pinObject) && this.state.storyList });
-    
-    // Closing the modal
-
-    //Adding a Pin on the Current Story
-    // this.state.map.addMarker({
-    //   lat: lat ,
-    //   lng: lng ,
-    //   title: location,
-    //   click: function(e) {
-    //     alert('You clicked in this marker');
-    //   }
-    // });
-
-
-    
-
-
 
   },
 
