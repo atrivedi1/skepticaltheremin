@@ -116,7 +116,6 @@ var MainPage = React.createClass({
         pin.comment = comment;
       }
     });
-    alert('changed');
     this.setState({pins:updateStateArray});
 
   },
