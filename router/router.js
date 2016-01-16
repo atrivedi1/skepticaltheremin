@@ -199,7 +199,8 @@ module.exports = function(app){
        if (err) {
         return console.error(err);
       }
-      res.json(data);
+      // res.json(data);
+      res.sendStatus(201);
       console.log("successfully added a pin");
     });
   });

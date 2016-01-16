@@ -7,7 +7,7 @@ var MainPage = React.createClass({
   getInitialState: function() {
     // makes a get request to server user story data
     // var state = GET request to server sending user array of objects [{}, {}, {}] { storyNames:['Hello', 'World'] };
-    return {};
+    return {pins:[]};
   },
 
   componentDidMount: function() {
@@ -34,15 +34,15 @@ var MainPage = React.createClass({
   getUserStory: function(storyID) {
     helpers.getSingleStory(storyID, function(data) {
       console.log(data);
-
       this.setState({
-        storyPins: data
-      }, function() {console.log(this.state);});
+        pins: data,
+        storyID: storyID
+      }, function() {console.log(this.state, 'got user story');});
     }.bind(this));
   },
 
   createStory: function(newStory) {
-    helpers.createNewStory(newStory, function(data) {
+    helpers.createNewStory(newStory, this.state.userID, function(data) {
       this.setState({
         storyID: data.id,
       }, function() {
@@ -58,43 +58,38 @@ var MainPage = React.createClass({
    // Delete it from the database
    // helpers.deletePinRequest(id);
 
+    console.log('ID', id)
     var pinList = this.state.pins;
+    console.log("Old pins", pinList);
    
     for(var i = 0; i <pinList.length; i++){ 
       var pin = pinList[i];
 
-      if(pin.pinID !== id){
+      if(pin.id !== id){
         array.push(pin);  
       } else {
         console.log('Deleting', pin.pinID);
       }
     }
+    console.log("Deleting Pins", array);
 
     this.setState({pins:array});
   
   },
 
 
-  addStoryPin: function(pin, cb){
+  addStoryPin: function(pindata, cb){
    // Send to database
-
-   // $.ajax({
-   //   url: '/api/maps/' + username,
-   //   type: 'POST',
-   //   success: function(data) {
-   //     // this.setState({data: data});
-   //     console.log(data);
-   //     return cb(data);
-   //   },
-   //   error: function(xhr, status, err) {
-   //     console.log(status, err.toString());
-   //   }
-
-
-    this.state.pins.push(pin);
-    this.setState({ pins: this.state.pins });
-    cb();
-
+   var pins = this.state.pins;
+   pins.push(pindata);
+   helpers.addPin(pindata, this.state.storyID,function(results) {
+    this.setState({
+      pins: pins
+    }, function(){
+      console.log(this.state.pins);
+       cb();
+    }.bind(this)); 
+   }.bind(this));
   },
 
   updateComment: function(pinID, comment){
