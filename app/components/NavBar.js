@@ -61,7 +61,7 @@ var NavBar = React.createClass({
 
             <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul className="nav navbar-nav navbar-right">
-                <li><a href="#" data-toggle="modal" data-target="#myModal">+ Add a Story</a></li>
+                <li><a href="#" data-toggle="modal" data-target="#createStory">+ Add a Story</a></li>
                 <li className="dropdown">
                   <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">View A Story<span className="caret"></span></a>
                   {/*** Adds UserStoryList Dropdown ***/}
@@ -69,13 +69,13 @@ var NavBar = React.createClass({
                     {storyList}
                   </ul>
                 </li>
-                <li><a href='#'>Logout</a></li>
+                <li><a href='/logout'>Logout</a></li>
               </ul>
             </div>
           </div>
         </nav>
 
-        <div id="myModal" className="modal fade" role="dialog">
+        <div id="createStory" className="modal fade" role="dialog">
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
