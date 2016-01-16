@@ -8,16 +8,29 @@ var NavBar = React.createClass({
 
   // },
 
-  // getInitialState: function() {
-  //   return { open : false };
-  // },
+  getInitialState: function() {
+    return {};
+  },
 
+  updateStoryState: function(e) {
+    var storyValue = e.target.value;
+    this.setState({
+      newStory: storyValue
+    });
+  },
+
+  createUserStory: function(e) {
+    var story = this.state.newStory;
+    this.props.createStory(story);
+  },
   // handleItemClick: function(item) {
   //   this.setState({
   //     open: false,
   //     itemTitle: item
   //   });
   // },
+
+
 
 
 
@@ -71,11 +84,11 @@ var NavBar = React.createClass({
               </div>
               <div className="modal-body">
                 <form className="form-group list-group">
-                  <input type="text" className="form-control" id="location" placeholder="Add a new story here!" />
+                  <input type="text" className="form-control" id="new-story" placeholder="Add a new story here!" onChange={this.updateStoryState} />
                 </form>
               </div>
               <div className="modal-footer">
-                <input type='button' className='btn btn-success' value='Add New Story'/>
+                <input type='button' className='btn btn-success' data-dismiss="modal" data-target="#myModal" value='Add New Story' onClick={this.createUserStory}/>
               </div>
             </div>
           </div>

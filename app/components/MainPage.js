@@ -2,13 +2,12 @@ var React = require('react');
 var NavBar = require('./NavBar');
 var MapApp = require('./MapApp');
 var helpers = require('../utils/helpers');
-var session = require('express-session');
 
 var MainPage = React.createClass({
   getInitialState: function() {
     // makes a get request to server user story data
     // var state = GET request to server sending user array of objects [{}, {}, {}] { storyNames:['Hello', 'World'] };
-    return {userid : 2};
+    return {};
   },
 
   componentDidMount: function() {
@@ -40,11 +39,18 @@ var MainPage = React.createClass({
     }.bind(this));
   },
 
+  createStory: function(newStory) {
+    console.log(newStory, 'newStory');
+    helpers.createNewStory(newStory, function(data) {
+      this.getUserStory(data.id);
+    }.bind(this));
+  },
+
 
   render() {
     return (
       <div className='container'>
-        <NavBar options={this.state} getUserStory={this.getUserStory}/>
+        <NavBar options={this.state} getUserStory={this.getUserStory} createStory = {this.createStory} />
         <MapApp storyPins={this.state.storyPins}/>
       </div>
     );
