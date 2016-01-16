@@ -2,6 +2,7 @@ var React = require('react');
 var NavBar = require('./NavBar');
 var MapApp = require('./MapApp');
 var helpers = require('../utils/helpers');
+var session = require('express-session');
 
 var MainPage = React.createClass({
   getInitialState: function() {
@@ -11,20 +12,21 @@ var MainPage = React.createClass({
   },
 
   componentDidMount: function() {
-    helpers.getAllStories(this.state.userid, function(data) {
-      if (this.isMounted()) {
-        // var storyArray = data.storyName.map(function(storyObj) {
-        //   console.log(storyObj);
-        //   return storyObj.name;
-        // });
+    helpers.getUserID(function(data) {
+      this.setState({
+        userid: data.id
+      }, function() {
+          helpers.getAllStories(this.state.userid, function(data) {
+            if (this.isMounted()) {
+              this.setState({
+                storyNames: data.storyName,
+                storyPins: data.storyPins
+                }
+              );
+            }
 
-        this.setState({
-          storyNames: data.storyName,
-          storyPins: data.storyPins
-          }
-        );
-      }
-
+          }.bind(this));
+      });
     }.bind(this));
   },
 
