@@ -15,6 +15,33 @@ var getAllBreadCrumbs = function(username, cb) {
   });
 };
 
+var getUserID = function(callback) {
+  $.ajax({
+    url: '/userid',
+    type: 'GET',
+    success: function(data) {
+      callback(data);
+    },
+    error: function(xhr, status,err) {
+      console.log(status,err.toString());
+    }
+  });
+};
+
+var createNewStory = function(storyName, callback) {
+  // $.ajax({
+  //   url: '/api/story',
+  //   type: 'POST',
+  //   success: function(data) {
+  //     callback(data);
+  //   },
+  //   error: function(xhr, status, err) {
+  //     console.log(status,err.toString());
+  //   }
+  // });
+  callback({id: 2, name:'Hi'});
+};
+
 var getSingleStory = function(storyID, callback) {
   $.ajax({
     url: '/api/story/' + storyID,
@@ -159,7 +186,9 @@ var helpers = {
   sendStory: sendStory,
   addPin: addPin,
   getAllStories: getAllStories,
-  getSingleStory: getSingleStory
+  getSingleStory: getSingleStory,
+  createNewStory: createNewStory,
+  getUserID: getUserID
 }
 
 module.exports = helpers;

@@ -7,24 +7,25 @@ var MainPage = React.createClass({
   getInitialState: function() {
     // makes a get request to server user story data
     // var state = GET request to server sending user array of objects [{}, {}, {}] { storyNames:['Hello', 'World'] };
-    return {userid : 2};
+    return {};
   },
 
   componentDidMount: function() {
-    helpers.getAllStories(this.state.userid, function(data) {
-      if (this.isMounted()) {
-        // var storyArray = data.storyName.map(function(storyObj) {
-        //   console.log(storyObj);
-        //   return storyObj.name;
-        // });
+    helpers.getUserID(function(data) {
+      this.setState({
+        userid: data.id
+      }, function() {
+          helpers.getAllStories(this.state.userid, function(data) {
+            if (this.isMounted()) {
+              this.setState({
+                storyNames: data.storyName,
+                storyPins: data.storyPins
+                }
+              );
+            }
 
-        this.setState({
-          storyNames: data.storyName,
-          storyPins: data.storyPins
-          }
-        );
-      }
-
+          }.bind(this));
+      });
     }.bind(this));
   },
 
@@ -38,12 +39,22 @@ var MainPage = React.createClass({
     }.bind(this));
   },
 
+  createStory: function(newStory) {
+    helpers.createNewStory(newStory, function(data) {
+      this.setState({
+        storyID: data.id,
+      }, function() {
+        this.getUserStory(data.id);
+      }.bind(this));
+    }.bind(this));
+  },
+
 
   render() {
     return (
       <div className='container'>
-        <NavBar options={this.state} getUserStory={this.getUserStory}/>
-        <MapApp storyPins={this.state.storyPins}/>
+        <NavBar options={this.state} getUserStory={this.getUserStory} createStory = {this.createStory} />
+        <MapApp storyPins={this.state.storyPins} storyID={this.state.storyID} storyName={this.state.storyName} userID={this.state.userid}/>
       </div>
     );
   }
