@@ -20,6 +20,8 @@ var Map = React.createClass({
       currentMarker: null,
       lastMarkerTimeStamp: null,
       map: null,
+      currentComment: '',
+      commentID:''
     }
   },
   
@@ -59,6 +61,17 @@ var Map = React.createClass({
 
   },
 
+  updatePinComment(e){
+    this.setState({currentComment: e.target.value})
+  },
+  updateComment(){
+    alert("sumbitting new comment");
+    var pinID = this.state.commentID;
+    var newComment = this.state.currentComment;
+    $("#commentModal").modal('hide');
+    this.props.updateComment(pinID, newComment);
+  },
+
   deletePin(id){
     console.log('DELETING PIN MAP.JS', id);
     this.props.deletePin(id);
@@ -76,7 +89,13 @@ var Map = React.createClass({
     var map = this.state.map;
     map.removeMarkers();
 
+    //debugger;
+
+    console.log(this.state.oldPins);
+
     this.state.oldPins.forEach(function(pin, index){
+
+      // COLOR FUNCTIONALITY
       cachedStories[pin.storyID] = cachedStories[pin.storyID] || {color: this.getRandomColor(), list:[]};
       cachedStories[pin.storyID]['list'].push(pin);
       
@@ -86,7 +105,7 @@ var Map = React.createClass({
         lng: pin.longitude,
         infoWindow:{
           content: `<div>
-          <a>${pin.comment}</a> <br><br>
+          <a class='viewComment' data-comment=${pin.comment}>View Comment</a> <br><br>
           <a data-pinid=${pin.pinID} class='delete'>Delete</a>
         </div>`
         },
@@ -97,12 +116,13 @@ var Map = React.createClass({
       });
 
 
+      // If their are two pins relating to the same story
       if(cachedStories[pin.storyID]['list'].length > 1){
 
         var length = cachedStories[pin.storyID]['list'].length;
 
-        var old = cachedStories[pin.storyID]['list'][length-1];
-        var current = cachedStories[pin.storyID]['list'][length];
+        var old = cachedStories[pin.storyID]['list'][length-2];
+        var current = cachedStories[pin.storyID]['list'][length-1];
 
         map.drawRoute({
           origin: [old.latitude, old.longitude ],
@@ -148,6 +168,15 @@ var Map = React.createClass({
       // });
 
     })
+
+    $(document).on('click', '.viewComment', function(){
+      var comment = $(this).data('comment');
+      var commentID =  $(this).parent().find('.delete').data('pinid');
+      self.setState({commentID: commentID});
+      self.setState({currentComment: comment });
+      $("#commentModal").modal()
+    })
+
   },
 
 
@@ -274,7 +303,10 @@ var Map = React.createClass({
     //Then update the states oldPin to refer to the actual pinList
     // console.log('DELETED PIN',this.state.oldPins);
 
+    // this.loadOldPins();
+
     if( this.props.oldPins.length !== this.state.oldPins.length ){
+
       alert("PINS have updated");
       //debugger;  
       this.setState({oldPins:this.props.oldPins}, function(){
@@ -332,12 +364,10 @@ var Map = React.createClass({
     };
 
     // Adding a story to our database
-    this.props.addStoryPin(pinObject);
+    this.props.addStoryPin(pinObject, function(){
+      $("#myModal").modal('hide')
+    }.bind(this));
 
-    $("#myModal").modal('hide')
-
-    debugger;
-    this.loadOldPins();
 
     // if(this.state.storyList.length > 1){
     //   var storyList = this.state.storyList;
@@ -396,18 +426,13 @@ var Map = React.createClass({
         { /* Create Separate Component for this Model */ }
         <div id="myModal" className="modal fade" role="dialog">
           <div className="modal-dialog">
-
             <div className="modal-content">
-
               <div className="modal-header">
                 <button type="button" className="close" data-dismiss="modal">&times;</button>
                 <h4 className="modal-title">Modal Header</h4>
               </div>
-
               <div className="modal-body">
-
-                <form className="form-group list-group" >
-                  
+                <form className="form-group list-group" >                 
                   <div class="form-group">
                     {/*Location */}
                     <label htmlFor="location">Location:</label>
@@ -421,14 +446,12 @@ var Map = React.createClass({
                       <input type="text" disabled={ this.state.storyList.length > 0 ? true : false } className="form-control" id="storyName" onChange={this.handleStoryChange} value={this.state.storyName} placeholder="Late Night Adventures" />
                     </div>
                   */}
-
                   <div class="form-group">
                     {/*Comment Box*/}
                     <label htmlFor="comment">Comment:</label>
                     <textarea value={this.state.comment} onChange={this.handleCommentChange} className="form-control" rows="10" id="comment"></textarea>
                   </div>
                 </form>
-
               </div>
 
               <div className="modal-footer">
@@ -440,6 +463,38 @@ var Map = React.createClass({
             </div>
 
           </div>
+        </div>
+
+
+
+
+          <div id="commentModal" className="modal fade" role="dialog">
+            <div className="modal-dialog">
+
+              <div className="modal-content">
+                <div className="modal-header">
+                  <button type="button" className="close" data-dismiss="modal">&times;</button>
+                  <h4 className="modal-title">Modal Header</h4>
+                </div>
+                <div className="modal-body">
+
+                  <form className="form-group list-group" >
+
+                    <div class="form-group">
+                      {/*Comment Box*/}
+                      <label htmlFor="comment">Comment:</label>
+                      <textarea value={this.state.currentComment} onChange={this.updatePinComment} className="form-control" rows="10" id="comment"></textarea>
+                    </div>
+                  </form>
+                </div>
+
+                <div className="modal-footer">
+                  <input type='button' onClick={this.updateComment} className='btn btn-success' value='Add New Story'/>
+                  {/* <input type="button" onClick={this.submitStory} className="btn btn-primary" value="Sumbit Story" /> */}
+                </div>
+              </div>
+
+            </div>
         </div>
 
 

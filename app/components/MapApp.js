@@ -106,11 +106,13 @@ var MapApp = React.createClass({
 
   addStoryPin(pin, cb){
     this.props.addStoryPin(pin,cb);
-    //helpers.addPin(this.state.user, pin, cb);
   },
 
   deletePin(id){
     this.props.deletePin(id);
+  },
+  updateComment(pinID, comment){
+    this.props.updateComment(pinID, comment);
   },
 
   // // Adds a new breadCrumb to the database
@@ -225,6 +227,7 @@ var MapApp = React.createClass({
             deletePin={this.deletePin}
             addNewStory={this.addNewStory}
             storyName={this.state.storyName}
+            updateComment={this.updateComment}
 
           />
 
