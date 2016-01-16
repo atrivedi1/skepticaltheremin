@@ -86,7 +86,7 @@ module.exports = function(app){
    })
   });
 
-  //PROVIDE SESSION USERID TO CLIENT
+  //PROVIDE USERID TO CLIENT WHEN THEY SIGN IN/ARE CREATED
   app.get('/userid', function(req, res){
     res.json(req.session.userid);
   });
@@ -102,12 +102,12 @@ module.exports = function(app){
   ///////////// OTHER USER HANDLERS//////////////
 
   //REMOVE USER
-  app.delete('/api/users', function (req, res) {
+  app.delete('/api/users/:userid', function (req, res) {
     console.log("trying to delete existing user");
     //define value to be removed from database 
-    var username = [req.body.username];
+    var userID = [Number(req.params.userid)];
     //call removeUser method in user controller
-    controller.user.removeUser(username, function(err, data){
+    controller.user.removeUser(userID, function(err, data){
        if (err) {
         return console.error(err);
       }
@@ -116,43 +116,37 @@ module.exports = function(app){
     });
   }); 
 
-  ////////ADD/REMOVE FRIEND HANDLERS///////////
-
-  //ADD FRIEND 
-
-  //REMOVE FRIEND
-
 
 ///////////////////////////////////////////////////STORY-RELATED REQUEST HANDLERS////////////////////////////////////////////////
 
   //CREATE STORY**
   app.post('/api/story', function (req, res) {
     console.log("trying to create a story");
-    var storyData = [req.body.userid, req.body.category, req.body.storyName];
+    var storyData = [req.body.userid, req.body.storyName];
     controller.story.createStory(storyData, function(err, data){
        if (err) {
         return console.error(err);
       }
-      res.sendStatus(201);
+      res.json(data);
       console.log("successfully enabling user to create a story");
     });
   }); 
 
-
   //UPDATE STORY**
-  // app.put('/api/story/:id', function (req, res) {
-  //   console.log("trying to update a story");
-  //   var pinData = req.body.map(function(pinObject){
-  //     return [Number(req.params.id), pinObject.categoryid, pinObject.location, pinObject.latitude, pinObject.longitude, pinObject.comment, pinObject.time];
-  //   });
-  //   controller.story.updateStory(pinData, function(err, data){
-  //      if (err) {
-  //       return console.error(err);
-  //     }
-  //     res.sendStatus(200);
-  //     console.log("succesfully enabling user to edit story");
-  //   });
-  // }); 
+  //NEED TO ASK SOMEONE ABOUT THIS...
+  app.put('/api/story/:storyid', function (req, res) {
+    console.log("trying to update a story");
+    //eventually will want to add categoryName;
+    var storyData = [Number(req.params.storyid), req.body.storyName];
+    console.log("storyData -->", storyData);
+    controller.story.updateStory(storyData, function(err, data){
+       if (err) {
+        return console.error(err);
+      }
+      res.sendStatus(200);
+      console.log("succesfully enabling user to edit story");
+    });
+  }); 
 
   //VIEW STORY (personal or a friend's)
   app.get('/api/story/:storyid', function (req, res) {
@@ -182,19 +176,18 @@ module.exports = function(app){
     });
   });
 
-
   //REMOVE STORY
-  // app.delete('/api/story/:storyid', function (req, res) {
-  //   console.log("trying to delete an existing story");
-  //   var storyID = [Number(req.params.storyid)];
-  //   controller.user.removeStory(username, function(err, data){
-  //      if (err) {
-  //       return console.error(err);
-  //     }
-  //     res.end();
-  //     console.log("successfully deleted story from db");
-  //   });
-  // });
+  app.delete('/api/story/:storyid', function (req, res) {
+    console.log("trying to delete an existing story");
+    var storyID = [Number(req.params.storyid)];
+    controller.story.removeStory(storyID, function(err, data){
+       if (err) {
+        return console.error(err);
+      }
+      res.end();
+      console.log("successfully deleted story from db");
+    });
+  });
 
 ///////////////////////////////////////////////////PIN-RELATED REQUEST HANDLERS////////////////////////////////////////////////
 
@@ -206,30 +199,29 @@ module.exports = function(app){
        if (err) {
         return console.error(err);
       }
-      res.sendStatus(201);
+      res.json(data);
       console.log("successfully added a pin");
     });
   });
 
   //EDIT PIN
-  // app.put('/api/pin/:storyid', function (req, res) {
-  //   console.log("adding a pin");
-  //   var pinData = [req.body.userid, Number(req.params.storyid), req.body.location, req.body.latitude, req.body.longitude, req.body.comment, req.body.time];
-  //   controller.pin.createPin(pinData, function(err, data){
-  //      if (err) {
-  //       return console.error(err);
-  //     }
-  //     res.sendStatus(201);
-  //     console.log("successfully added a pin");
-  //   });
-  // });
+  app.put('/api/pin/:pinid', function (req, res) {
+    console.log("editing a pin");
+    var pinData = [Number(req.params.pinid), req.body.location, req.body.latitude, req.body.longitude, req.body.comment, req.body.time];
+    controller.pin.updatePin(pinData, function(err, data){
+       if (err) {
+        return console.error(err);
+      }
+      res.sendStatus(200);
+      console.log("successfully edit pin");
+    });
+  });
 
-
-  //remove pin
-  app.delete('/api/pin/:id', function (req, res) {
+  //REMOVE PIN
+  app.delete('/api/pin/:pinid', function (req, res) {
     console.log("deleting a pin");
-    var pinData = [req.body.username, req.body.category, req.body.storyName];
-    controller.story.viewStories(storyData, function(err, data){
+    var pinID = [Number(req.params.pinid)];
+    controller.pin.removePin(pinID, function(err, data){
        if (err) {
         return console.error(err);
       }
@@ -239,6 +231,6 @@ module.exports = function(app){
   });
 
 
-  };
+};
 
 

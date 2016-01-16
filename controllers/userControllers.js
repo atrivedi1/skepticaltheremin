@@ -32,7 +32,7 @@ module.exports = {
   },
 
   removeUser: function(params, callback){
-    var queryString = "DELETE FROM users WHERE username = $1";
+    var queryString = "DELETE FROM users WHERE id = $1";
     db.query(queryString, params, function(err, results){
       callback(err, results);
     });
