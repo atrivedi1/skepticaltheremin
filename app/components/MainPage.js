@@ -13,13 +13,15 @@ var MainPage = React.createClass({
   componentDidMount: function() {
     helpers.getUserID(function(data) {
       this.setState({
-        userid: data.id
+        userID: data.id
+        // userID: 1
       }, function() {
-          helpers.getAllStories(this.state.userid, function(data) {
+          console.log(this.state.userID, 'userID');
+          helpers.getAllStories(this.state.userID, function(data) {
             if (this.isMounted()) {
               this.setState({
                 storyNames: data.storyName,
-                storyPins: data.storyPins
+                pins: data.storyPins
                 }
               );
             }
@@ -49,12 +51,94 @@ var MainPage = React.createClass({
     }.bind(this));
   },
 
+  deletePin: function(id){
+    alert('deleting pins from MainPage');
+    var array = [];
+
+   // Delete it from the database
+   // helpers.deletePinRequest(id);
+
+    var pinList = this.state.pins;
+   
+    for(var i = 0; i <pinList.length; i++){ 
+      var pin = pinList[i];
+
+      if(pin.pinID !== id){
+        array.push(pin);  
+      } else {
+        console.log('Deleting', pin.pinID);
+      }
+    }
+
+    this.setState({pins:array});
+  
+  },
+
+
+  addStoryPin: function(pin, cb){
+   // Send to database
+
+   // $.ajax({
+   //   url: '/api/maps/' + username,
+   //   type: 'POST',
+   //   success: function(data) {
+   //     // this.setState({data: data});
+   //     console.log(data);
+   //     return cb(data);
+   //   },
+   //   error: function(xhr, status, err) {
+   //     console.log(status, err.toString());
+   //   }
+
+
+    this.state.pins.push(pin);
+    this.setState({ pins: this.state.pins });
+    cb();
+
+  },
+
+  updateComment: function(pinID, comment){
+     // Move this to helper function if time
+   
+   // $.ajax({
+   //   url: '/api/maps/' + username,
+   //   type: 'POST',
+   //   success: function(data) {
+
+   //     var updateStateArray = this.state.pins.map(function(pin){
+   //       if(pin.pinID === pinID){
+   //         pin.comment = comment;
+   //       }
+   //     });
+   //     this.setState({pins:updateStateArray});
+   //   },
+   //   error: function(xhr, status, err) {
+   //     console.log(status, err.toString());
+   //   }
+
+    var updateStateArray = this.state.pins.map(function(pin){
+      if(pin.pinID === pinID){
+        pin.comment = comment;
+      }
+    });
+    alert('changed');
+    this.setState({pins:updateStateArray});
+
+  },
+
 
   render() {
     return (
       <div className='container'>
         <NavBar options={this.state} getUserStory={this.getUserStory} createStory = {this.createStory} />
-        <MapApp storyPins={this.state.storyPins} storyID={this.state.storyID} storyName={this.state.storyName} userID={this.state.userid}/>
+        <MapApp 
+          storyPins={this.state.pins} 
+          storyID={this.state.storyID} 
+          storyName={this.state.storyName} 
+          userID={this.state.userID}  
+          addStoryPin={this.addStoryPin} 
+          deletePin={this.deletePin}
+          updateComment={this.updateComment}/>
       </div>
     );
   }

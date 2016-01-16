@@ -26,6 +26,7 @@ var getUserID = function(callback) {
       console.log(status,err.toString());
     }
   });
+  // callback(); for testing purposes
 };
 
 var createNewStory = function(storyName, callback) {
@@ -86,7 +87,7 @@ var sendStory = function(username, storyList, cb){
   //       console.log(status, err.toString());
   //     }
   // })
-}
+};
 
 var addPin = function(username, pin, cb){
   
