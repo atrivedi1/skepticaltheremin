@@ -1,0 +1,46 @@
+html, body {
+    margin:0;
+    font-family: 'Open Sans', sans-serif;
+}
+
+body {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('./overland-advanture.jpg');
+  margin: 0 auto;
+  background-size: 100%;
+  background-repeat: no-repeat;
+}
+
+h1 {
+    margin:0;
+}
+
+.overlay {
+  position: absolute;
+  top:0;
+  left:0;
+  height:100%;
+  width:100%;
+  opacity: 1;
+}
+
+.container {
+  text-align: center;
+  display: table;
+}
+
+.holder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -50px;
+  margin-left: -150px;
+  width: 300px;
+  height: 100px;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+a {
+  text-decoration: none;
+  color: #ffffff;
+}
