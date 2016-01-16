@@ -10,9 +10,9 @@ var Map = React.createClass({
     return {
       // Connected to the location input
       location: this.props.address,
+      delete:false,
       storyList:[],
       storyName: this.props.storyName,
-      small:false,
       oldPins: this.props.oldPins,
       lat: this.props.lat,
       lng: this.props.lng,
@@ -26,6 +26,15 @@ var Map = React.createClass({
   // Change event from the location input
   handleLocationChange(e) {
     this.setState({location: e.target.value});  
+  },
+
+  getRandomColor(){
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
   },
  
   // Grabs the comments from the comment textarea 
@@ -59,11 +68,20 @@ var Map = React.createClass({
 
 
   // Loading all the old Pins from the database
-  loadOldPins(maps){
-    maps.removeMarkers();
-    this.state.oldPins.forEach(function(pin){
+  loadOldPins(){
 
-      maps.addMarker({
+    var cachedStories = {
+    };
+
+    var map = this.state.map;
+    map.removeMarkers();
+
+    this.state.oldPins.forEach(function(pin, index){
+      cachedStories[pin.storyID] = cachedStories[pin.storyID] || {color: this.getRandomColor(), list:[]};
+      cachedStories[pin.storyID]['list'].push(pin);
+      
+
+      map.addMarker({
         lat: pin.latitude,
         lng: pin.longitude,
         infoWindow:{
@@ -74,9 +92,28 @@ var Map = React.createClass({
         },
         title: pin.location,
         click: function(e) {
-          maps.setCenter(pin.latitude, pin.longitude);
+          map.setCenter(pin.latitude, pin.longitude);
         }
       });
+
+
+      if(cachedStories[pin.storyID]['list'].length > 1){
+
+        var length = cachedStories[pin.storyID]['list'].length;
+
+        var old = cachedStories[pin.storyID]['list'][length-1];
+        var current = cachedStories[pin.storyID]['list'][length];
+
+        map.drawRoute({
+          origin: [old.latitude, old.longitude ],
+          destination: [current.latitude, current.longitude],
+          travelMode: 'driving',
+          strokeColor: cachedStories[pin.storyID],
+          strokeOpacity: 1,
+          strokeWeight: 6
+        });
+        
+      }
 
     }.bind(this));
 
@@ -86,35 +123,34 @@ var Map = React.createClass({
     var self = this;
 
     $(document).on('click', '.delete', function(e){
-      var id= $(this).data('pinid'); 
+
+      var id= $(this).data('pinid');
+
+      // GOING TO SEND THE DELETED PIN TO THE DATABASE
       self.deletePin(id);
       
-      var pinList = self.state.oldPins
-      // console.log("oldpin",pinList);
+      // var pinList = self.state.oldPins
 
-      var deletePin = _.find(pinList, function(pin){
-        return pin.pinID === id;
-      });
-      // console.log(deletePin);
-      var index = pinList.indexOf(deletePin);
-      console.log(index);
+      // var array = [];
+      // for(var i = 0; i < pinList.length; i++){ 
+      //   var pin = pinList[i];
+      //   if(pin.pinID !== id){
+      //     array.push(pinList[i]);  
+      //   } else {
+      //     console.log('Deleting', pin.pinID);
+      //   }
+      // }
 
-      console.log("OLD PINS",pinList);
-      self.setState({'oldPins': pinList.splice(index, 1) });
-      console.log('NEW PINS',pinList);
-      self.setState({'small':true})
+      // console.log(array);
+
+      // self.setState({'oldPins': array, 'delete':true}, function(){
+      //   self.loadOldPins();
+      // });
 
     })
   },
 
 
-
-
-
-
-  toggleFavorite(address){
-    this.props.onFavoriteToggle(address);
-  },
 
   addFavBreadCrumb(id, lat, lng, timestamp, details, infoWindow, location) {
     this.props.onAddToFavBcs(id, lat, lng, timestamp, details, infoWindow, location);
@@ -138,7 +174,7 @@ var Map = React.createClass({
   },
 
   componentDidMount(){
-
+    // alert('Did');
     // Only componentDidMount is called when the component is first added to
     // the page. This is why we are calling the following method manually. 
     // This makes sure that our map initialization code is run the first time.
@@ -147,7 +183,7 @@ var Map = React.createClass({
     var self = this;
 
     // This is creating the map and centering our code
-    window.map = new GMaps({
+    var map = new GMaps({
       el: '#map',
       zoom:2,
       lat: this.props.lat,
@@ -159,22 +195,16 @@ var Map = React.createClass({
     // This map is now attached to our state
     this.setState({ map: map },function(){
       
-      // Once the state is loaded. LOAD THE PINS
+      // Once the state is loaded. LOAD THE PINS ONLY IF THEIR ARE PINS
       if(this.state.oldPins.length > 0){   
-        // // Removes any markers on the map if their is any
-        // if(map.markers.length > 0){
-        //   self.removeMarkers(self.state.map);
-        //   self.loadOldPins(self.state.map); 
-        // } else {
-        //   self.loadOldPins(self.state.map);
-        // }
-        // return;
-        self.loadOldPins(self.state.map);
+        self.loadOldPins();
       } 
     });
 
-
+    // Only gets changed for search for address
+    // Or search for geolocation
     map.setCenter(this.props.lat, this.props.lng);
+
 
     // LOADING THE FUNCTION
     //Right Click Menu
@@ -194,8 +224,9 @@ var Map = React.createClass({
           // PASSES THE LG AND LT TO SEARCHADDRESS IN MAPAPP
           // MAPAPP PASSES IT TO THIS FILE HERE AND PASSES IT TO THE LOCATION INPUT
           self.props.searchAddress(addressString, function(newLocation){
+            
             // Were setting state inside here manually causing a re-render
-            self.setState({location: newLocation, comment: "Add comments here and save breadcrumb"});         
+            self.setState({location: newLocation, comment: "Add comments here!"});         
           });
 
 
@@ -239,19 +270,19 @@ var Map = React.createClass({
 
   componentDidUpdate(){
 
-    if(this.state.small){
-      console.log("I got called");
-      console.log('map',this.state.map)
-      this.loadOldPins(window.map);
-      this.setState({small: false});
+    // IF the data from the main source ever changes and doesn't match this
+    //Then update the states oldPin to refer to the actual pinList
+    // console.log('DELETED PIN',this.state.oldPins);
+
+    if( this.props.oldPins.length !== this.state.oldPins.length ){
+      alert("PINS have updated");
+      //debugger;  
+      this.setState({oldPins:this.props.oldPins}, function(){
+        this.loadOldPins();
+      })
     }
 
-    // Just in case if things are not re-rendering
-    if(this.props.oldPins.length !== this.state.oldPins.length){
-      // console.log("I should be updating the map");
-      // this.setState({oldPins: this.props.oldPins});
-      // this.loadOldPins(this.state.oldPins);
-    }
+
 
     // Update child Component
     if(this.state.location !== this.props.address){
@@ -266,7 +297,7 @@ var Map = React.createClass({
       return;
     }
 
-    // Centering the app
+    // On a change this centers the app
     this.state.map.setCenter(this.props.center.lat, this.props.center.lng);
     this.lastLat = this.props.center.lat;
     this.lastLng = this.props.center.lng
@@ -300,41 +331,48 @@ var Map = React.createClass({
       name: storyName
     };
 
-    // Updating the state with the the pins that are making up a story
-    this.setState({"storyList": this.state.storyList.push(pinObject) && this.state.storyList });
-    
-    // Closing the modal
-    $("#myModal").modal('hide');
-
-    //Adding a Pin on the Current Story
-    this.state.map.addMarker({
-      lat: lat ,
-      lng: lng ,
-      title: location,
-      click: function(e) {
-        alert('You clicked in this marker');
-      }
-    });
-
-
-    if(this.state.storyList.length > 1){
-      var storyList = this.state.storyList;
-
-      var prevPin = storyList[storyList.length-2];
-
-      this.state.map.drawRoute({
-        origin: [prevPin.latitude, prevPin.longitutde ],
-        destination: [lat, lng],
-        travelMode: 'driving',
-        strokeColor: '#131540',
-        strokeOpacity: 1,
-        strokeWeight: 6
-      }); 
-    }
-    
-
     // Adding a story to our database
     this.props.addStoryPin(pinObject);
+
+    $("#myModal").modal('hide')
+
+    debugger;
+    this.loadOldPins();
+
+    // if(this.state.storyList.length > 1){
+    //   var storyList = this.state.storyList;
+
+    //   var prevPin = storyList[storyList.length-2];
+
+    //   this.state.map.drawRoute({
+    //     origin: [prevPin.latitude, prevPin.longitutde ],
+    //     destination: [lat, lng],
+    //     travelMode: 'driving',
+    //     strokeColor: '#131540',
+    //     strokeOpacity: 1,
+    //     strokeWeight: 6
+    //   }); 
+    // }
+
+    // Updating the state with the the pins that are making up a story
+    // this.setState({"storyList": this.state.storyList.push(pinObject) && this.state.storyList });
+    
+    // Closing the modal
+
+    //Adding a Pin on the Current Story
+    // this.state.map.addMarker({
+    //   lat: lat ,
+    //   lng: lng ,
+    //   title: location,
+    //   click: function(e) {
+    //     alert('You clicked in this marker');
+    //   }
+    // });
+
+
+    
+
+
 
   },
 
@@ -346,7 +384,8 @@ var Map = React.createClass({
 
 
   render(){
-
+    // console.log("I MAP should be empty at one point PROPS",this.props.oldPins);
+    // console.log("state",this.state.oldPins);
     return (
       <div>
         <div className="map-holder">
@@ -394,7 +433,7 @@ var Map = React.createClass({
 
               <div className="modal-footer">
                 <input type='button' onClick={this.persistPin} className='btn btn-success' value='Add New Story'/>
-                <input type="button" onClick={this.submitStory} className="btn btn-primary" value="Sumbit Story" />
+                {/* <input type="button" onClick={this.submitStory} className="btn btn-primary" value="Sumbit Story" /> */}
               </div>
 
 

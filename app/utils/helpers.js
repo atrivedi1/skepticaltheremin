@@ -107,8 +107,8 @@ var addPin = function(username, pin, cb){
 
 };
 
-var deletePinRequest = function(id){
-  console.log('HELPER delete Pin', id);
+var deletePinRequest = function(id, cb){
+  // console.log('HELPER delete Pin', id);
   // $.ajax({
   //   url:`/api/pin/${id}`,
   //   type:'DELETE',

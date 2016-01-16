@@ -57,6 +57,7 @@ var MapApp = React.createClass({
     // console.log('storyID',this.props.storyID);
     // console.log('storyName', this.props.storyName);
 
+    // If no array then that means its a ADD COMMENT
     // If the story array has 0 pins then get the geocoordinates
     if(this.props.storyPins.length === 0){
 
@@ -104,13 +105,12 @@ var MapApp = React.createClass({
   },
 
   addStoryPin(pin, cb){
-    alert("I am in the MapApp");
-    helpers.addPin(this.state.user, pin, cb);
+    this.props.addStoryPin(pin,cb);
+    //helpers.addPin(this.state.user, pin, cb);
   },
 
   deletePin(id){
-    console.log("MapApp deleting PIN", id);
-    helpers.deletePinRequest(id);
+    this.props.deletePin(id);
   },
 
   // // Adds a new breadCrumb to the database
@@ -187,7 +187,6 @@ var MapApp = React.createClass({
   },
 
   render(){
-
       return (
         <div>
 
@@ -206,7 +205,7 @@ var MapApp = React.createClass({
 
             favorites={this.state.favorites}
             onFavoriteToggle={this.toggleFavorite}
-            addStoryPin={this.addStoryPin}
+            
 
             // Adding A Individual Story
             onAddToFavBcs={this.addToFavBreadCrumbs}
@@ -222,6 +221,7 @@ var MapApp = React.createClass({
             userID={this.props.userID}
             storyID={this.props.storyID}
             oldPins={this.props.storyPins}
+            addStoryPin={this.addStoryPin}
             deletePin={this.deletePin}
             addNewStory={this.addNewStory}
             storyName={this.state.storyName}
