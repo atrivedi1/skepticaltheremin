@@ -40,9 +40,12 @@ var MainPage = React.createClass({
   },
 
   createStory: function(newStory) {
-    console.log(newStory, 'newStory');
     helpers.createNewStory(newStory, function(data) {
-      this.getUserStory(data.id);
+      this.setState({
+        storyID: data.id,
+      }, function() {
+        this.getUserStory(data.id);
+      }.bind(this));
     }.bind(this));
   },
 
@@ -51,7 +54,7 @@ var MainPage = React.createClass({
     return (
       <div className='container'>
         <NavBar options={this.state} getUserStory={this.getUserStory} createStory = {this.createStory} />
-        <MapApp storyPins={this.state.storyPins}/>
+        <MapApp storyPins={this.state.storyPins} storyID={this.state.storyID} storyName={this.state.storyName} userID={this.state.userid}/>
       </div>
     );
   }

@@ -29,16 +29,17 @@ var getUserID = function(callback) {
 };
 
 var createNewStory = function(storyName, callback) {
-  $.ajax({
-    url: '/api/story',
-    type: 'POST',
-    success: function(data) {
-      callback(data);
-    },
-    error: function(xhr, status, err) {
-      console.log(status,err.toString());
-    }
-  });
+  // $.ajax({
+  //   url: '/api/story',
+  //   type: 'POST',
+  //   success: function(data) {
+  //     callback(data);
+  //   },
+  //   error: function(xhr, status, err) {
+  //     console.log(status,err.toString());
+  //   }
+  // });
+  callback({id: 2, name:'Hi'});
 };
 
 var getSingleStory = function(storyID, callback) {
