@@ -213,7 +213,7 @@ module.exports = function(app){
         return console.error(err);
       }
       res.sendStatus(200);
-      console.log("successfully edit pin");
+      console.log("successfully edited pin");
     });
   });
 
